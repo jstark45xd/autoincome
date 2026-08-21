@@ -116,25 +116,31 @@ def buy(slug):
     if not product:
         abort(404)
 
-    # Temporary checkout.
-    # Stripe will replace this before accepting real payments.
+    stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
-    return render_template(
-        "success.html",
-        p=product
+    if not stripe.api_key:
+        abort(500, description="Stripe is not configured.")
+
+    session = stripe.checkout.Session.create(
+        mode="payment",
+        line_items=[
+            {
+                "price_data": {
+                    "currency": "usd",
+                    "product_data": {
+                        "name": product["name"],
+                        "description": product["description"],
+                    },
+                    "unit_amount": product["price_cents"],
+                },
+                "quantity": 1,
+            }
+        ],
+        success_url=request.host_url + "success?session_id={CHECKOUT_SESSION_ID}",
+        cancel_url=request.host_url + "product/" + product["slug"],
     )
 
-
-@app.route("/download/<filename>")
-def download(filename):
-    safe_filename = Path(filename).name
-
-    return send_from_directory(
-        BASE / "products",
-        safe_filename,
-        as_attachment=True
-    )
-
+    return redirect(session.url, code=303)
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
