@@ -1,2 +1,3 @@
 Flask>=3.0,<4
 gunicorn>=22,<24
+stripe>=12,<15
