@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Purchase Complete{% endblock %}
+
+{% block content %}
+
+<section class="success">
+
+  <h1>Thanks for your purchase!</h1>
+
+  <p>
+    Your digital product is ready.
+  </p>
+
+  <a class="button" href="/download/{{ p.filename }}">
+    Download {{ p.name }}
+  </a>
+
+  <p class="muted">
+    In the production version, this page will only appear
+    after a verified payment.
+  </p>
+
+</section>
+
+{% endblock %}
