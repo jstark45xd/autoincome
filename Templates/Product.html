@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}{{ p.name }} — AutoIncome{% endblock %}
+
+{% block content %}
+
+<article class="product">
+
+  <span class="pill">DIGITAL DOWNLOAD</span>
+
+  <h1>{{ p.name }}</h1>
+
+  <p class="large">
+    {{ p.description }}
+  </p>
+
+  <div class="price">
+    ${{ "%.2f"|format(p.price_cents / 100) }}
+  </div>
+
+  <form method="post" action="/buy/{{ p.slug }}">
+    <button class="button" type="submit">
+      Buy now
+    </button>
+  </form>
+
+  <p class="muted">
+    Secure payment processing will be connected before launch.
+  </p>
+
+</article>
+
+{% endblock %}
