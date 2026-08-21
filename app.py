@@ -15,9 +15,11 @@ from flask import (
 BASE = Path(__file__).parent
 DB = BASE / "autoincome.db"
 
-app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "development-secret")
-
+app = app = Flask(
+    __name__,
+    template_folder="templates",
+    static_folder="static"
+)
 
 def get_db():
     conn = sqlite3.connect(DB)
