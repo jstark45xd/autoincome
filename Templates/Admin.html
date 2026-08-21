@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Admin — AutoIncome{% endblock %}
+
+{% block content %}
+
+<h1>Product Admin</h1>
+
+<form method="post" class="form">
+
+  <input
+    name="password"
+    type="password"
+    placeholder="Admin password"
+    required
+  >
+
+  <input
+    name="name"
+    placeholder="Product name"
+    required
+  >
+
+  <input
+    name="slug"
+    placeholder="url-slug"
+    required
+  >
+
+  <textarea
+    name="description"
+    placeholder="Description"
+    required
+  ></textarea>
+
+  <input
+    name="price"
+    type="number"
+    step="0.01"
+    placeholder="Price in USD"
+    required
+  >
+
+  <input
+    name="filename"
+    placeholder="filename in products/"
+    required
+  >
+
+  <button class="button" type="submit">
+    Add product
+  </button>
+
+</form>
+
+<h2>Products</h2>
+
+{% for p in products %}
+
+<div class="row">
+  <b>{{ p.name }}</b>
+  <span>${{ "%.2f"|format(p.price_cents / 100) }}</span>
+</div>
+
+{% endfor %}
+
+{% endblock %}
