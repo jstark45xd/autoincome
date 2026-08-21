@@ -3,30 +3,15 @@ import sqlite3
 from pathlib import Path
 
 import stripe
-from flask import (
-    Flask,
-    render_template,
-    request,
-    redirect,
-    url_for,
-    send_from_directory,
-    abort,
-    flash,
-)
+from flask import Flask, render_template, request, redirect, send_from_directory, abort
 
 BASE = Path(__file__).parent
 DB = BASE / "autoincome.db"
 
-app = Flask(
-    __name__,
-    template_folder="templates",
-    static_folder="static",
-)
+app = Flask(__name__, template_folder="templates")
+app.secret_key = os.getenv("SECRET_KEY", "autoincome-secret")
 
-app.secret_key = os.getenv(
-    "SECRET_KEY",
-    "autoincome-development-secret",
-)
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 
 def get_db():
@@ -50,11 +35,11 @@ def init_db():
         )
     """)
 
-    existing = conn.execute(
+    count = conn.execute(
         "SELECT COUNT(*) FROM products"
     ).fetchone()[0]
 
-    if existing == 0:
+    if count == 0:
         conn.execute(
             """
             INSERT INTO products
@@ -79,268 +64,7 @@ def home():
     conn = get_db()
 
     products = conn.execute(
-        "SELECT * FROM products WHERE active=1 ORDER BY id DESC"
-    ).fetchall()
-
-    conn.close()
-
-    return render_template(
-        "home.html",
-        products=products,
-    )
-
-
-@app.route("/product/<slug>")
-def product(slug):
-    conn = get_db()
-
-    product = conn.execute(
-        "SELECT * FROM products WHERE slug=? AND active=1",
-        (slug,),
-    ).fetchone()
-
-    conn.close()
-
-    if not product:
-        abort(404)
-
-    return render_template(
-        "product.html",
-        p=product,
-    )
-
-
-@app.route("/buy/<slug>", methods=["POST"])
-def buy(slug):
-    conn = get_db()
-
-    product = conn.execute(
-        "SELECT * FROM products WHERE slug=? AND active=1",
-        (slug,),
-    ).fetchone()
-
-    conn.close()
-
-    if not product:
-        abort(404)
-
-    stripe_key = os.getenv("STRIPE_SECRET_KEY")
-
-    if not stripe_key:
-        abort(
-            500,
-            description="Stripe is not configured on the server.",
-        )
-
-    stripe.api_key = stripe_key
-
-    try:
-        session = stripe.checkout.Session.create(
-            mode="payment",
-            line_items=[
-                {
-                    "price_data": {
-                        "currency": "usd",
-                        "product_data": {
-                            "name": product["name"],
-                            "description": product["description"],
-                        },
-                        "unit_amount": product["price_cents"],
-                    },
-                    "quantity": 1,
-                }
-            ],
-            success_url=(
-                request.host_url
-                + "success?session_id={CHECKOUT_SESSION_ID}"
-            ),
-            cancel_url=(
-                request.host_url
-                + "product/"
-                + product["slug"]
-            ),
-        )
-
-    except Exception:
-        app.logger.exception("STRIPE CHECKOUT ERROR")
-
-        abort(
-            500,
-            description=(
-                "Stripe Checkout could not be created. "
-                "Check the Render logs."
-            ),
-        )
-
-    return redirect(session.url, code=303)
-
-
-@app.route("/success")
-def success():
-    session_id = request.args.get("session_id")
-
-    if not session_id:
-        abort(400)
-
-    stripe_key = os.getenv("STRIPE_SECRET_KEY")
-
-    if not stripe_key:
-        abort(500)
-
-    stripe.api_key = stripe_key
-
-    try:
-        session = stripe.checkout.Session.retrieve(
-            session_id
-        )
-
-    except Exception:
-        app.logger.exception("STRIPE SESSION ERROR")
-        abort(500)
-
-    if session.payment_status != "paid":
-        abort(403)
-
-    # Retrieve the product from the Checkout session.
-    line_items = stripe.checkout.Session.list_line_items(
-        session_id,
-        limit=1,
-    )
-
-    if not line_items.data:
-        abort(404)
-
-    purchased_name = line_items.data[0].description
-
-    conn = get_db()
-
-    product = conn.execute(
-        """
-        SELECT * FROM products
-        WHERE name=? AND active=1
-        """,
-        (purchased_name,),
-    ).fetchone()
-
-    conn.close()
-
-    if not product:
-        abort(404)
-
-    return render_template(
-        "success.html",
-        p=product,
-    )
-
-
-@app.route("/download/<filename>")
-def download(filename):
-    safe_filename = Path(filename).name
-
-    return send_from_directory(
-        BASE / "products",
-        safe_filename,
-        as_attachment=True,
-    )
-
-
-@app.route("/admin", methods=["GET", "POST"])
-def admin():
-    admin_password = os.getenv(
-        "ADMIN_PASSWORD",
-        "change-me",
-    )
-
-    if request.method == "POST":
-
-        if request.form.get("password") != admin_password:
-            flash("Incorrect password.")
-            return redirect(url_for("admin"))
-
-        conn = get_db()
-
-        conn.execute(
-            """
-            INSERT INTO products
-            (name, slug, description, price_cents, filename)
-            VALUES (?, ?, ?, ?, ?)
-            """,
-            (
-                request.form["name"],
-                request.form["slug"],
-                request.form["description"],
-                int(float(request.form["price"]) * 100),
-                request.form["filename"],
-            ),
-        )
-
-        conn.commit()
-        conn.close()
-
-        flash("Product added.")
-
-        return redirect(url_for("admin"))
-
-    conn = get_db()
-
-    products = conn.execute(
-        "SELECT * FROM products ORDER BY id DESC"
-    ).fetchall()
-
-    conn.close()
-
-    return render_template(
-        "admin.html",
-        products=products,
-    )
-
-
-init_db()
-
-
-if __name__ == "__main__":
-    app.run(
-        host="0.0.0.0",
-        port=int(os.getenv("PORT", 5000)),
-    )            name TEXT NOT NULL,
-            slug TEXT UNIQUE NOT NULL,
-            description TEXT NOT NULL,
-            price_cents INTEGER NOT NULL,
-            filename TEXT NOT NULL,
-            active INTEGER DEFAULT 1
-        )
-    """)
-
-    existing = conn.execute(
-        "SELECT COUNT(*) FROM products"
-    ).fetchone()[0]
-
-    if existing == 0:
-        conn.execute(
-            """
-            INSERT INTO products
-            (name, slug, description, price_cents, filename)
-            VALUES (?, ?, ?, ?, ?)
-            """,
-            (
-                "30-Day Content Planner",
-                "30-day-content-planner",
-                "A practical 30-day social-content planning template for small businesses and creators.",
-                1900,
-                "30-day-content-planner.txt",
-            ),
-        )
-
-    conn.commit()
-    conn.close()
-
-
-@app.route("/")
-def home():
-    conn = get_db()
-
-    products = conn.execute(
-        "SELECT * FROM products WHERE active=1 ORDER BY id DESC"
+        "SELECT * FROM products WHERE active=1"
     ).fetchall()
 
     conn.close()
@@ -357,7 +81,7 @@ def product(slug):
 
     product = conn.execute(
         "SELECT * FROM products WHERE slug=? AND active=1",
-        (slug,),
+        (slug,)
     ).fetchone()
 
     conn.close()
@@ -377,7 +101,7 @@ def buy(slug):
 
     product = conn.execute(
         "SELECT * FROM products WHERE slug=? AND active=1",
-        (slug,),
+        (slug,)
     ).fetchone()
 
     conn.close()
@@ -385,74 +109,107 @@ def buy(slug):
     if not product:
         abort(404)
 
-    stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
-
     if not stripe.api_key:
         abort(500, description="Stripe is not configured.")
 
-    session = stripe.checkout.Session.create(
-        mode="payment",
-        line_items=[
-            {
-                "price_data": {
-                    "currency": "usd",
-                    "product_data": {
-                        "name": product["name"],
-                        "description": product["description"],
+    try:
+        checkout = stripe.checkout.Session.create(
+            mode="payment",
+            line_items=[
+                {
+                    "price_data": {
+                        "currency": "usd",
+                        "product_data": {
+                            "name": product["name"],
+                        },
+                        "unit_amount": product["price_cents"],
                     },
-                    "unit_amount": product["price_cents"],
-                },
-                "quantity": 1,
-            }
-        ],
-        success_url=request.host_url + "success?session_id={CHECKOUT_SESSION_ID}",
-        cancel_url=request.host_url + "product/" + product["slug"],
-    )
-
-    return redirect(session.url, code=303)
-
-@app.route("/admin", methods=["GET", "POST"])
-def admin():
-
-    admin_password = os.getenv(
-        "ADMIN_PASSWORD",
-        "change-me"
-    )
-
-    if request.method == "POST":
-
-        if request.form.get("password") != admin_password:
-            flash("Incorrect password.")
-            return redirect(url_for("admin"))
-
-        conn = get_db()
-
-        conn.execute(
-            """
-            INSERT INTO products
-            (name, slug, description, price_cents, filename)
-            VALUES (?, ?, ?, ?, ?)
-            """,
-            (
-                request.form["name"],
-                request.form["slug"],
-                request.form["description"],
-                int(float(request.form["price"]) * 100),
-                request.form["filename"],
+                    "quantity": 1,
+                }
+            ],
+            success_url=(
+                request.host_url
+                + "success?session_id={CHECKOUT_SESSION_ID}"
+            ),
+            cancel_url=(
+                request.host_url
+                + "product/"
+                + product["slug"]
             ),
         )
 
-        conn.commit()
-        conn.close()
+        return redirect(checkout.url, code=303)
 
-        flash("Product added.")
+    except Exception:
+        app.logger.exception("STRIPE CHECKOUT ERROR")
+        abort(500, description="Stripe checkout failed.")
 
-        return redirect(url_for("admin"))
+
+@app.route("/success")
+def success():
+    session_id = request.args.get("session_id")
+
+    if not session_id:
+        abort(400)
+
+    if not stripe.api_key:
+        abort(500)
+
+    try:
+        session = stripe.checkout.Session.retrieve(session_id)
+
+        if session.payment_status != "paid":
+            abort(403)
+
+        items = stripe.checkout.Session.list_line_items(
+            session_id,
+            limit=1
+        )
+
+        if not items.data:
+            abort(404)
+
+        purchased_name = items.data[0].description
+
+    except Exception:
+        app.logger.exception("STRIPE SESSION ERROR")
+        abort(500)
 
     conn = get_db()
 
+    product = conn.execute(
+        "SELECT * FROM products WHERE name=? AND active=1",
+        (purchased_name,)
+    ).fetchone()
+
+    conn.close()
+
+    if not product:
+        abort(404)
+
+    return render_template(
+        "success.html",
+        p=product
+    )
+
+
+@app.route("/download/<filename>")
+def download(filename):
+    filename = Path(filename).name
+
+    return send_from_directory(
+        BASE / "products",
+        filename,
+        as_attachment=True
+    )
+
+
+@app.route("/admin")
+def admin():
+    conn = get_db()
+
     products = conn.execute(
-        "SELECT * FROM products ORDER BY id DESC"
+        "SELECT * FROM products"
     ).fetchall()
 
     conn.close()
@@ -469,5 +226,5 @@ init_db()
 if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
-        port=int(os.getenv("PORT", 5000))
+        port=int(os.getenv("PORT", "5000"))
     )
