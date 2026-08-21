@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}AutoIncome — Digital Products{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <p class="pill">AUTOMATED DIGITAL STORE</p>
+
+  <h1>Useful products. Instant delivery.</h1>
+
+  <p>
+    Sell digital products without manual fulfillment.
+    AutoIncome handles the storefront and digital delivery.
+  </p>
+</section>
+
+<section class="grid">
+
+  {% for p in products %}
+
+  <article class="card">
+
+    <span class="pill">DIGITAL DOWNLOAD</span>
+
+    <h2>{{ p.name }}</h2>
+
+    <p>{{ p.description }}</p>
+
+    <strong>
+      ${{ "%.2f"|format(p.price_cents / 100) }}
+    </strong>
+
+    <a class="button" href="/product/{{ p.slug }}">
+      View product
+    </a>
+
+  </article>
+
+  {% endfor %}
+
+</section>
+
+{% endblock %}
