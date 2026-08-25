@@ -9,7 +9,11 @@ BASE = Path(__file__).parent
 DB = BASE / "autoincome.db"
 
 app = Flask(__name__, template_folder="templates")
-app.secret_key = os.getenv("SECRET_KEY", "autoincome-secret")
+
+app.secret_key = os.getenv(
+    "SECRET_KEY",
+    "autoincome-development-secret"
+)
 
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
@@ -110,27 +114,45 @@ def buy(slug):
         abort(404)
 
     if not stripe.api_key:
-        abort(500, description="Stripe is not configured.")
+        abort(
+            500,
+            description="Stripe is not configured."
+        )
 
     try:
         checkout = stripe.checkout.Session.create(
             mode="payment",
+
             line_items=[
                 {
                     "price_data": {
                         "currency": "usd",
+
                         "product_data": {
                             "name": product["name"],
+                            "description": product["description"],
+
+                            # Stripe Managed Payments requires
+                            # an eligible product tax code.
+                            #
+                            # Use this only if the product is
+                            # accurately classified as a downloadable
+                            # digital book/content product.
+                            "tax_code": "txcd_10302000",
                         },
+
                         "unit_amount": product["price_cents"],
                     },
+
                     "quantity": 1,
                 }
             ],
+
             success_url=(
                 request.host_url
                 + "success?session_id={CHECKOUT_SESSION_ID}"
             ),
+
             cancel_url=(
                 request.host_url
                 + "product/"
@@ -138,11 +160,20 @@ def buy(slug):
             ),
         )
 
-        return redirect(checkout.url, code=303)
+        return redirect(
+            checkout.url,
+            code=303
+        )
 
     except Exception:
-        app.logger.exception("STRIPE CHECKOUT ERROR")
-        abort(500, description="Stripe checkout failed.")
+        app.logger.exception(
+            "STRIPE CHECKOUT ERROR"
+        )
+
+        abort(
+            500,
+            description="Stripe checkout failed."
+        )
 
 
 @app.route("/success")
@@ -156,7 +187,9 @@ def success():
         abort(500)
 
     try:
-        session = stripe.checkout.Session.retrieve(session_id)
+        session = stripe.checkout.Session.retrieve(
+            session_id
+        )
 
         if session.payment_status != "paid":
             abort(403)
@@ -172,13 +205,19 @@ def success():
         purchased_name = items.data[0].description
 
     except Exception:
-        app.logger.exception("STRIPE SESSION ERROR")
+        app.logger.exception(
+            "STRIPE SESSION ERROR"
+        )
+
         abort(500)
 
     conn = get_db()
 
     product = conn.execute(
-        "SELECT * FROM products WHERE name=? AND active=1",
+        """
+        SELECT * FROM products
+        WHERE name=? AND active=1
+        """,
         (purchased_name,)
     ).fetchone()
 
@@ -195,11 +234,11 @@ def success():
 
 @app.route("/download/<filename>")
 def download(filename):
-    filename = Path(filename).name
+    safe_filename = Path(filename).name
 
     return send_from_directory(
         BASE / "products",
-        filename,
+        safe_filename,
         as_attachment=True
     )
 
@@ -226,5 +265,7 @@ init_db()
 if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
-        port=int(os.getenv("PORT", "5000"))
+        port=int(
+            os.getenv("PORT", "5000")
+        )
     )
