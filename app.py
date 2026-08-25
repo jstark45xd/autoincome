@@ -1,5 +1,10 @@
 import os
 import sqlite3
+import hashlib
+import hmac
+import base64
+import json
+import time
 from pathlib import Path
 
 import stripe
@@ -10,12 +15,14 @@ DB = BASE / "autoincome.db"
 
 app = Flask(__name__, template_folder="templates")
 
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+
+# Use the Stripe secret as the signing secret when no separate
+# SECRET_KEY has been configured.
 app.secret_key = os.getenv(
     "SECRET_KEY",
-    "autoincome-development-secret"
+    os.getenv("STRIPE_SECRET_KEY", "autoincome-development-secret")
 )
-
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 
 def get_db():
@@ -61,6 +68,63 @@ def init_db():
 
     conn.commit()
     conn.close()
+
+
+def make_download_token(filename, session_id):
+    """Create a short-lived signed download token."""
+    secret = os.getenv("STRIPE_SECRET_KEY")
+
+    if not secret:
+        return None
+
+    payload = {
+        "filename": filename,
+        "session_id": session_id,
+        "expires": int(time.time()) + 3600,
+    }
+
+    encoded = base64.urlsafe_b64encode(
+        json.dumps(payload, separators=(",", ":")).encode()
+    ).decode()
+
+    signature = hmac.new(
+        secret.encode(),
+        encoded.encode(),
+        hashlib.sha256,
+    ).hexdigest()
+
+    return encoded + "." + signature
+
+
+def verify_download_token(token):
+    """Verify a download token and return its payload."""
+    secret = os.getenv("STRIPE_SECRET_KEY")
+
+    if not secret or not token or "." not in token:
+        return None
+
+    encoded, signature = token.rsplit(".", 1)
+
+    expected = hmac.new(
+        secret.encode(),
+        encoded.encode(),
+        hashlib.sha256,
+    ).hexdigest()
+
+    if not hmac.compare_digest(signature, expected):
+        return None
+
+    try:
+        payload = json.loads(
+            base64.urlsafe_b64decode(encoded.encode()).decode()
+        )
+    except Exception:
+        return None
+
+    if payload.get("expires", 0) < int(time.time()):
+        return None
+
+    return payload
 
 
 @app.route("/")
@@ -131,13 +195,6 @@ def buy(slug):
                         "product_data": {
                             "name": product["name"],
                             "description": product["description"],
-
-                            # Stripe Managed Payments requires
-                            # an eligible product tax code.
-                            #
-                            # Use this only if the product is
-                            # accurately classified as a downloadable
-                            # digital book/content product.
                             "tax_code": "txcd_10302000",
                         },
 
@@ -226,19 +283,44 @@ def success():
     if not product:
         abort(404)
 
+    download_token = make_download_token(
+        product["filename"],
+        session_id
+    )
+
+    if not download_token:
+        abort(500)
+
+    download_url = url_for(
+        "download",
+        filename=product["filename"],
+        token=download_token
+    )
+
     return render_template(
         "success.html",
-        p=product
+        p=product,
+        download_url=download_url
     )
 
 
 @app.route("/download/<filename>")
 def download(filename):
-    safe_filename = Path(filename).name
+    token = request.args.get("token")
+
+    payload = verify_download_token(token)
+
+    if not payload:
+        abort(403)
+
+    requested_filename = Path(filename).name
+
+    if payload.get("filename") != requested_filename:
+        abort(403)
 
     return send_from_directory(
         BASE / "products",
-        safe_filename,
+        requested_filename,
         as_attachment=True
     )
 
