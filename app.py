@@ -8,7 +8,7 @@ import time
 from pathlib import Path
 
 import stripe
-from flask import Flask, render_template, request, redirect, send_from_directory, abort
+from flask import Flask, render_template, request, redirect, send_from_directory, abort, url_for  
 
 BASE = Path(__file__).parent
 DB = BASE / "autoincome.db"
