@@ -6,20 +6,16 @@
 
 <section class="success">
 
-  <h1>Thanks for your purchase!</h1>
+    <h1>Thanks for your purchase!</h1>
 
-  <p>
-    Your digital product is ready.
-  </p>
+    <p>
+        Your payment was successfully verified.
+        Your digital product is ready.
+    </p>
 
-  <a class="button" href="/download/{{ p.filename }}">
-    Download {{ p.name }}
-  </a>
-
-  <p class="muted">
-    In the production version, this page will only appear
-    after a verified payment.
-  </p>
+    <a class="button" href="{{ download_url }}">
+        Download {{ p.name }}
+    </a>
 
 </section>
 
