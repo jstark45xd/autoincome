@@ -4,30 +4,305 @@
 
 {% block content %}
 
-<article class="product">
+<section class="hero">
 
-  <span class="pill">DIGITAL DOWNLOAD</span>
+  <p class="pill">30-DAY CONTENT PLANNER</p>
 
   <h1>{{ p.name }}</h1>
 
   <p class="large">
-    {{ p.description }}
+    30 days of social media content without the daily guesswork.
+  </p>
+
+  <p>
+    A practical, ready-to-use content planning workbook for
+    small businesses, entrepreneurs, creators, and service providers.
   </p>
 
   <div class="price">
     ${{ "%.2f"|format(p.price_cents / 100) }}
   </div>
 
+  <p class="muted">
+    One-time payment • Instant digital download • No subscription
+  </p>
+
   <form method="post" action="/buy/{{ p.slug }}">
     <button class="button" type="submit">
-      Buy now
+      Get the 30-Day Planner — ${{ "%.2f"|format(p.price_cents / 100) }}
     </button>
   </form>
 
-  <p class="muted">
-    Secure payment processing will be connected before launch.
+</section>
+
+
+<section>
+
+  <h2>Stop wondering what to post</h2>
+
+  <p>
+    Consistently creating social media content can take hours.
+    This planner gives you a structured starting point for an
+    entire month so you can spend less time staring at a blank
+    screen and more time creating useful content for your audience.
   </p>
 
-</article>
+</section>
+
+
+<section>
+
+  <h2>What's inside</h2>
+
+  <div class="grid">
+
+    <article class="card">
+      <span class="pill">30 DAYS</span>
+
+      <h3>Daily Content Prompts</h3>
+
+      <p>
+        A complete 30-day sequence covering education,
+        engagement, trust-building, objections, and offers.
+      </p>
+    </article>
+
+    <article class="card">
+      <span class="pill">HOOKS</span>
+
+      <h3>Ready-to-Adapt Hooks</h3>
+
+      <p>
+        Start each post with a suggested opening that you
+        can customize for your business and audience.
+      </p>
+    </article>
+
+    <article class="card">
+      <span class="pill">CTAs</span>
+
+      <h3>Calls to Action</h3>
+
+      <p>
+        Each content idea includes a suggested next step
+        to encourage engagement or action.
+      </p>
+    </article>
+
+    <article class="card">
+      <span class="pill">WORKBOOK</span>
+
+      <h3>Planning Worksheets</h3>
+
+      <p>
+        Track platforms, publishing dates, results, and
+        what content performs best.
+      </p>
+    </article>
+
+    <article class="card">
+      <span class="pill">BONUS</span>
+
+      <h3>Repurposing Guide</h3>
+
+      <p>
+        Learn how to turn one strong idea into multiple
+        pieces of content instead of constantly starting over.
+      </p>
+    </article>
+
+    <article class="card">
+      <span class="pill">REVIEW</span>
+
+      <h3>Weekly Review</h3>
+
+      <p>
+        Review your results and identify the types of
+        content you should create more of.
+      </p>
+    </article>
+
+  </div>
+
+</section>
+
+
+<section class="hero">
+
+  <p class="pill">A LOOK INSIDE</p>
+
+  <h2>Here's the kind of guidance you'll get</h2>
+
+  <article class="card">
+
+    <h3>Day 1 — Introduce the Problem</h3>
+
+    <p>
+      <strong>Goal:</strong>
+      Help your audience recognize a problem you solve.
+    </p>
+
+    <p>
+      <strong>Hook:</strong>
+      "Struggling with [problem]? You're not the only one."
+    </p>
+
+    <p>
+      <strong>Content:</strong>
+      Explain the problem your business helps customers solve
+      and describe why it matters.
+    </p>
+
+    <p>
+      <strong>Call to action:</strong>
+      "Have you dealt with this? Tell me below."
+    </p>
+
+  </article>
+
+</section>
+
+
+<section>
+
+  <h2>Who is this for?</h2>
+
+  <div class="grid">
+
+    <article class="card">
+      <h3>Small Businesses</h3>
+      <p>
+        For businesses that need a simple way to stay
+        consistent on social media.
+      </p>
+    </article>
+
+    <article class="card">
+      <h3>Creators</h3>
+      <p>
+        For creators who want a reliable source of
+        content ideas without starting from scratch.
+      </p>
+    </article>
+
+    <article class="card">
+      <h3>Service Providers</h3>
+      <p>
+        For professionals who want to educate their
+        audience and demonstrate their expertise.
+      </p>
+    </article>
+
+  </div>
+
+</section>
+
+
+<section>
+
+  <h2>How it works</h2>
+
+  <div class="grid">
+
+    <article class="card">
+      <span class="pill">1</span>
+      <h3>Purchase</h3>
+      <p>
+        Complete the secure Stripe checkout.
+      </p>
+    </article>
+
+    <article class="card">
+      <span class="pill">2</span>
+      <h3>Download</h3>
+      <p>
+        After successful payment, you'll receive
+        access to your digital download.
+      </p>
+    </article>
+
+    <article class="card">
+      <span class="pill">3</span>
+      <h3>Start Planning</h3>
+      <p>
+        Customize the prompts for your business
+        and start building your 30-day content plan.
+      </p>
+    </article>
+
+  </div>
+
+</section>
+
+
+<section>
+
+  <h2>Frequently Asked Questions</h2>
+
+  <article class="card">
+
+    <h3>Is this a subscription?</h3>
+
+    <p>
+      No. It's a one-time purchase of a digital product.
+    </p>
+
+    <h3>How do I receive the planner?</h3>
+
+    <p>
+      After your payment is successfully completed,
+      you'll be taken to the download page.
+    </p>
+
+    <h3>Can I use it for my own business?</h3>
+
+    <p>
+      Yes. The planner is designed to help you organize
+      and create your own social media content.
+    </p>
+
+    <h3>Do I need special software?</h3>
+
+    <p>
+      No special software is required to use the planner.
+    </p>
+
+    <h3>Is there a recurring charge?</h3>
+
+    <p>
+      No. You pay once and receive the digital product.
+    </p>
+
+  </article>
+
+</section>
+
+
+<section class="hero">
+
+  <p class="pill">READY TO GET STARTED?</p>
+
+  <h2>Plan your next 30 days today.</h2>
+
+  <p>
+    Stop starting every morning with a blank screen.
+    Give yourself a simple content plan and start creating.
+  </p>
+
+  <div class="price">
+    ${{ "%.2f"|format(p.price_cents / 100) }}
+  </div>
+
+  <p class="muted">
+    One-time payment • Instant digital download
+  </p>
+
+  <form method="post" action="/buy/{{ p.slug }}">
+    <button class="button" type="submit">
+      Get the Planner
+    </button>
+  </form>
+
+</section>
 
 {% endblock %}
