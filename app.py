@@ -16,6 +16,7 @@ from flask import (
     send_from_directory,
     abort,
     url_for,
+    Response,
 )
 
 BASE = Path(__file__).parent
@@ -404,6 +405,44 @@ def content_ideas():
     return render_template(
         "content-ideas.html",
         products=products,
+    )
+
+
+@app.route("/sitemap.xml")
+def sitemap():
+    pages = [
+        "/",
+        "/product/30-day-content-planner",
+        "/blog/30-social-media-content-ideas",
+    ]
+
+    xml = '<?xml version="1.0" encoding="UTF-8"?>'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+
+    for page in pages:
+        xml += "<url>"
+        xml += f"<loc>{request.host_url.rstrip('/')}{page}</loc>"
+        xml += "</url>"
+
+    xml += "</urlset>"
+
+    return Response(
+        xml,
+        mimetype="application/xml",
+    )
+
+
+@app.route("/robots.txt")
+def robots():
+    text = (
+        "User-agent: *\n"
+        "Allow: /\n\n"
+        f"Sitemap: {request.host_url.rstrip('/')}/sitemap.xml\n"
+    )
+
+    return Response(
+        text,
+        mimetype="text/plain",
     )
 
 
