@@ -77,7 +77,19 @@ def init_db():
                 "30-day-content-planner",
                 "A practical, ready-to-use content planning workbook for small businesses, entrepreneurs, creators, and service providers.",
                 1900,
-                "30-day-content-planner.txt",
+                "AutoIncome_30_Day_Content_Planner_Bundle.pdf",
+            ),
+        )
+    else:
+        conn.execute(
+            """
+            UPDATE products
+            SET filename=?
+            WHERE slug=?
+            """,
+            (
+                "AutoIncome_30_Day_Content_Planner_Bundle.pdf",
+                "30-day-content-planner",
             ),
         )
 
@@ -227,30 +239,24 @@ def buy(slug):
     try:
         checkout = stripe.checkout.Session.create(
             mode="payment",
-
             line_items=[
                 {
                     "price_data": {
                         "currency": "usd",
-
                         "product_data": {
                             "name": product["name"],
                             "description": product["description"],
                             "tax_code": "txcd_10302000",
                         },
-
                         "unit_amount": product["price_cents"],
                     },
-
                     "quantity": 1,
                 }
             ],
-
             success_url=(
                 request.host_url
                 + "success?session_id={CHECKOUT_SESSION_ID}"
             ),
-
             cancel_url=(
                 request.host_url
                 + "product/"
@@ -421,7 +427,9 @@ def sitemap():
 
     for page in pages:
         xml += "<url>"
-        xml += f"<loc>{request.host_url.rstrip('/')}{page}</loc>"
+        xml += (
+            f"<loc>{request.host_url.rstrip('/')}{page}</loc>"
+        )
         xml += "</url>"
 
     xml += "</urlset>"
