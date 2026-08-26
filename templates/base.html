@@ -3,52 +3,21 @@
 <head>
   <meta charset="utf-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <meta
     name="google-site-verification"
     content="TXTbP2ayz7KG53O9S-mtnr3T2M5zksLXQZtGy4EM1mE"
   >
 
-  <title>{% block title %}AutoIncome — Digital Products{% endblock %}</title>
-
   <meta
     name="description"
     content="Ready-to-use digital products that help small businesses, creators, and entrepreneurs save time and get more done."
   >
 
-  <meta
-    name="robots"
-    content="index, follow"
-  >
+  <meta name="robots" content="index, follow">
 
-  <meta
-    property="og:title"
-    content="{% block og_title %}AutoIncome — Digital Products{% endblock %}"
-  >
-
-  <meta
-    property="og:description"
-    content="Practical digital products designed to help you save time and stay organized."
-  >
-
-  <meta
-    property="og:type"
-    content="website"
-  >
-
-  <meta
-    property="og:url"
-    content="{{ request.url }}"
-  >
-
-  <meta
-    name="twitter:card"
-    content="summary"
-  >
+  <title>{% block title %}AutoIncome{% endblock %}</title>
 
   <style>
     * {
@@ -61,12 +30,7 @@
 
     body {
       margin: 0;
-      font-family:
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: #f7f8fa;
       color: #17202a;
       line-height: 1.6;
@@ -152,8 +116,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns:
-        repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 22px;
     }
 
@@ -188,14 +151,6 @@
       font-weight: 700;
       cursor: pointer;
       font-size: 16px;
-      transition:
-        transform .15s ease,
-        opacity .15s ease;
-    }
-
-    .button:hover {
-      opacity: .88;
-      transform: translateY(-1px);
     }
 
     .price {
@@ -225,7 +180,6 @@
     }
 
     @media (max-width: 600px) {
-
       header {
         padding: 16px 5%;
       }
@@ -240,10 +194,6 @@
 
       main {
         padding: 40px 5%;
-      }
-
-      section {
-        margin-bottom: 50px;
       }
 
       h1 {
@@ -276,7 +226,6 @@
 <body>
 
 <header>
-
   <a href="/">
     <strong>AutoIncome</strong>
   </a>
@@ -285,276 +234,11 @@
     <a href="/">Store</a>
     <a href="/admin">Admin</a>
   </nav>
-
 </header>
 
 <main>
-
   {% block content %}{% endblock %}
-
 </main>
-
-<footer>
-  Practical digital products • Secure checkout • Instant delivery
-</footer>
-
-</body>
-</html>
-  <meta
-    property="og:url"
-    content="{{ request.url }}"
-  >
-
-  <meta
-    name="twitter:card"
-    content="summary"
-  >
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      margin: 0;
-      font-family:
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-      background: #f7f8fa;
-      color: #17202a;
-      line-height: 1.6;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 18px 7%;
-      background: white;
-      border-bottom: 1px solid #e5e7eb;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    header a {
-      text-decoration: none;
-      color: #111;
-    }
-
-    header strong {
-      font-size: 18px;
-    }
-
-    nav {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    nav a {
-      color: #555;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    nav a:hover {
-      color: #111;
-    }
-
-    main {
-      max-width: 1050px;
-      margin: auto;
-      padding: 55px 7%;
-    }
-
-    section {
-      margin-bottom: 70px;
-    }
-
-    .hero {
-      max-width: 760px;
-      margin-bottom: 55px;
-    }
-
-    h1 {
-      font-size: clamp(40px, 7vw, 72px);
-      line-height: 1.02;
-      letter-spacing: -0.04em;
-      margin: 15px 0 25px;
-    }
-
-    h2 {
-      font-size: clamp(28px, 4vw, 42px);
-      line-height: 1.15;
-      letter-spacing: -0.025em;
-      margin-bottom: 18px;
-    }
-
-    h3 {
-      line-height: 1.25;
-    }
-
-    .hero p,
-    .large {
-      font-size: 20px;
-      line-height: 1.65;
-      color: #667085;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns:
-        repeat(auto-fit, minmax(250px, 1fr));
-      gap: 22px;
-    }
-
-    .card,
-    .product,
-    .success {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 18px;
-      padding: 28px;
-      box-shadow: 0 8px 30px #00000008;
-    }
-
-    .card {
-      height: 100%;
-    }
-
-    .card strong {
-      display: block;
-      font-size: 28px;
-      margin: 20px 0;
-    }
-
-    .button {
-      display: inline-block;
-      border: 0;
-      border-radius: 10px;
-      padding: 14px 20px;
-      background: #111;
-      color: white;
-      text-decoration: none;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 16px;
-      transition:
-        transform .15s ease,
-        opacity .15s ease;
-    }
-
-    .button:hover {
-      opacity: .88;
-      transform: translateY(-1px);
-    }
-
-    .price {
-      font-size: 48px;
-      font-weight: 800;
-      line-height: 1;
-      margin: 25px 0;
-    }
-
-    .pill {
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: .08em;
-      color: #667085;
-    }
-
-    .muted {
-      color: #8a94a6;
-      font-size: 14px;
-    }
-
-    footer {
-      text-align: center;
-      padding: 35px 20px;
-      color: #8a94a6;
-      font-size: 14px;
-    }
-
-    @media (max-width: 600px) {
-
-      header {
-        padding: 16px 5%;
-      }
-
-      nav {
-        gap: 12px;
-      }
-
-      nav a {
-        font-size: 13px;
-      }
-
-      main {
-        padding: 40px 5%;
-      }
-
-      section {
-        margin-bottom: 50px;
-      }
-
-      h1 {
-        font-size: 43px;
-      }
-
-      .hero p,
-      .large {
-        font-size: 18px;
-      }
-
-      .card,
-      .product,
-      .success {
-        padding: 22px;
-      }
-
-      .price {
-        font-size: 42px;
-      }
-
-      .button {
-        width: 100%;
-        text-align: center;
-      }
-    }
-  </style>
-</head>
-
-<body>
-
-<header>
-
-  <a href="/">
-    <strong>AutoIncome</strong>
-  </a>
-
-  <nav>
-    <a href="/">Store</a>
-    <a href="/admin">Admin</a>
-  </nav>
-
-</header>
-
-
-<main>
-
-  {% block content %}{% endblock %}
-
-</main>
-
 
 <footer>
   Practical digital products • Secure checkout • Instant delivery
