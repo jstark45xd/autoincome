@@ -1,21 +1,119 @@
 {% extends "base.html" %}
 
-{% block title %}AutoIncome — Digital Products{% endblock %}
+{% block title %}30-Day Content Planner — AutoIncome{% endblock %}
 
 {% block content %}
 
 <section class="hero">
-  <p class="pill">AUTOMATED DIGITAL STORE</p>
 
-  <h1>Useful products. Instant delivery.</h1>
+  <p class="pill">30-DAY CONTENT PLANNER</p>
+
+  <h1>30 Days of Content.<br>Zero Guesswork.</h1>
 
   <p>
-    Sell digital products without manual fulfillment.
-    AutoIncome handles the storefront and digital delivery.
+    Stop wondering what to post every day.
+    Get a ready-to-use content planner designed to help
+    small businesses and creators stay consistent online.
   </p>
+
+  {% for p in products %}
+  <a class="button" href="/product/{{ p.slug }}">
+    Get the Planner — ${{ "%.2f"|format(p.price_cents / 100) }}
+  </a>
+  {% endfor %}
+
+  <p>
+    <small>One-time payment • Instant digital download • No subscription</small>
+  </p>
+
 </section>
 
-<section class="grid">
+
+<section>
+
+  <h2>Everything you need to plan your next 30 days</h2>
+
+  <p>
+    Spend less time trying to figure out what to post
+    and more time growing your business.
+  </p>
+
+  <div class="grid">
+
+    <article class="card">
+      <span class="pill">01</span>
+      <h3>30 Days of Ideas</h3>
+      <p>
+        A structured month of content prompts so you
+        always have something useful to share.
+      </p>
+    </article>
+
+    <article class="card">
+      <span class="pill">02</span>
+      <h3>Easy to Follow</h3>
+      <p>
+        Simple prompts you can adapt to your business,
+        brand, audience, and social platform.
+      </p>
+    </article>
+
+    <article class="card">
+      <span class="pill">03</span>
+      <h3>Save Time</h3>
+      <p>
+        Stop starting from a blank screen every morning.
+        Use the planner to organize your month in advance.
+      </p>
+    </article>
+
+  </div>
+
+</section>
+
+
+<section class="hero">
+
+  <p class="pill">WHAT YOU GET</p>
+
+  <h2>A simple plan for staying consistent.</h2>
+
+  <p>
+    Your download gives you a practical starting point
+    for planning social content without spending hours
+    brainstorming ideas.
+  </p>
+
+  <div class="card">
+
+    <h3>Example content prompts</h3>
+
+    <p>
+      <strong>Day 1 — Introduce Your Business</strong><br>
+      Tell your audience who you are, what you do,
+      and who you help.
+    </p>
+
+    <p>
+      <strong>Day 2 — Behind the Scenes</strong><br>
+      Show your audience something they normally
+      wouldn't see about your business.
+    </p>
+
+    <p>
+      <strong>Day 3 — Solve a Customer Problem</strong><br>
+      Address a common problem your ideal customer
+      has and explain how you can help.
+    </p>
+
+  </div>
+
+</section>
+
+
+<section>
+
+  <h2>Simple. Affordable. Ready when you are.</h2>
 
   {% for p in products %}
 
@@ -27,17 +125,82 @@
 
     <p>{{ p.description }}</p>
 
-    <strong>
+    <h2>
       ${{ "%.2f"|format(p.price_cents / 100) }}
-    </strong>
+    </h2>
+
+    <p>
+      One-time purchase. No recurring subscription.
+      Download your product after successful payment.
+    </p>
 
     <a class="button" href="/product/{{ p.slug }}">
-      View product
+      Get the Planner
     </a>
 
   </article>
 
   {% endfor %}
+
+</section>
+
+
+<section>
+
+  <h2>Frequently Asked Questions</h2>
+
+  <article class="card">
+
+    <h3>Is this a subscription?</h3>
+
+    <p>
+      No. This is a one-time digital purchase.
+    </p>
+
+    <h3>How do I receive it?</h3>
+
+    <p>
+      After your payment is successfully completed,
+      you'll be taken to the download page.
+    </p>
+
+    <h3>Do I need special software?</h3>
+
+    <p>
+      The planner is delivered as a digital file that
+      you can open on a phone, tablet, or computer.
+    </p>
+
+    <h3>Is checkout secure?</h3>
+
+    <p>
+      Payments are processed through Stripe's secure
+      checkout system. AutoIncome does not handle your
+      card number directly.
+    </p>
+
+  </article>
+
+</section>
+
+
+<section class="hero">
+
+  <p class="pill">READY TO GET STARTED?</p>
+
+  <h2>Plan your next 30 days today.</h2>
+
+  {% for p in products %}
+
+  <a class="button" href="/product/{{ p.slug }}">
+    Get the 30-Day Planner — ${{ "%.2f"|format(p.price_cents / 100) }}
+  </a>
+
+  {% endfor %}
+
+  <p>
+    <small>Instant digital delivery • One-time payment</small>
+  </p>
 
 </section>
 
